@@ -11,6 +11,9 @@ interface ItemDAO {
     @Query("SELECT * FROM item WHERE category == :categoryName")
     fun getAllInCategory(categoryName: String?): List<Item>
 
+    @Query("DELETE FROM item WHERE category == :categoryName")
+    fun deleteAllInCategory(categoryName: String?)
+
     @Insert
     fun insertItem(item: Item) : Long
 

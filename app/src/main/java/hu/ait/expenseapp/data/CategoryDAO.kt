@@ -5,7 +5,8 @@ import androidx.room.*
 @Dao
 interface CategoryDAO {
     @Query("SELECT * FROM category")
-    fun getAllCategories(): List<Category>
+    fun getAllCategories(): MutableList<Category>
+
 
     @Insert
     fun insertCategory(category: Category) : Long

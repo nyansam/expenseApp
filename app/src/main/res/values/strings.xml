@@ -17,7 +17,7 @@
     <string name="hint2">This field can not be empty</string>
     <string name="item_name">Item Name:</string>
     <string name="category_name">Category Name:</string>
-    <string name="estimated_price">Estimated Price:</string>
+    <string name="estimated_price">Price:</string>
     <string name="item_description">Item Description:</string>
     <string name="purchased">Purchased</string>
     <string name="cate">Category</string>

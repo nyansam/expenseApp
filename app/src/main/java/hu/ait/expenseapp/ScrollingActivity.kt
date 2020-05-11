@@ -19,7 +19,6 @@ import hu.ait.expenseapp.data.Category
 import hu.ait.expenseapp.data.Item
 import hu.ait.expenseapp.data.ItemDatabase
 import hu.ait.expenseapp.touch.TodoReyclerTouchCallback
-import kotlinx.android.synthetic.main.activity_details.*
 import kotlinx.android.synthetic.main.activity_scrolling.*
 import kotlinx.android.synthetic.main.activity_scrolling.app_bar
 import kotlinx.android.synthetic.main.activity_scrolling.toolbar
@@ -120,13 +119,20 @@ class ScrollingActivity : AppCompatActivity(), CategoryDialog.CategoryHandler, I
                 itemAdapter.addItem(item)
             }
         }.start()
+        updateCategories()
+    }
+
+    public fun deleteCategoryItems(categoryName: String){
+        Thread {
+            ItemDatabase.getInstance(this).itemDao().deleteAllInCategory(categoryName)
+        }
     }
 
     override fun categoryCreated(category: Category) {
         saveCategory(category)
     }
 
-    override fun categoryUpdated(category: Category) {
+    public fun updateCategories() {
         Thread {
             var categories = AppDatabase.getInstance(this).categoryDao().getAllCategories()
 
@@ -134,14 +140,17 @@ class ScrollingActivity : AppCompatActivity(), CategoryDialog.CategoryHandler, I
                 Thread {
                     var allItems = ItemDatabase.getInstance(this).itemDao()
                         .getAllInCategory(category.categoryName)
-                    category.numItems = allItems.size
                     var total = 0
                     for (item in allItems){
                         total += item.price.toInt()
                     }
-                }
+                    category.numItems = allItems.size
+                    category.totalAmount = total
+                }.start()
             }
-            categoryAdapter.updateCategory()
+            runOnUiThread {
+                categoryAdapter.updateCategory(categories)
+            }
         }.start()
 
     }
@@ -194,6 +203,13 @@ class ScrollingActivity : AppCompatActivity(), CategoryDialog.CategoryHandler, I
                             categoryAdapter.deleteAll()
                         }
                     }.start()
+
+                    Thread {
+                        ItemDatabase.getInstance(this@ScrollingActivity).itemDao().deleteAll()
+                        runOnUiThread {
+                            itemAdapter.deleteAll()
+                        }
+                    }.start()
                 }
             })
 
@@ -208,7 +224,6 @@ class ScrollingActivity : AppCompatActivity(), CategoryDialog.CategoryHandler, I
     }
 
     override fun onBackPressed() {
-        //super.onBackPressed()
         Toast.makeText(this,
             "You can not exit",
             Toast.LENGTH_LONG).show()

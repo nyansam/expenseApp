@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import hu.ait.expenseapp.DetailsActivity
 import hu.ait.expenseapp.R
+import hu.ait.expenseapp.ScrollingActivity
 import hu.ait.expenseapp.data.Item
 import hu.ait.expenseapp.data.ItemDatabase
 import kotlinx.android.synthetic.main.item_row.view.*
@@ -63,6 +64,7 @@ class ItemAdapter : RecyclerView.Adapter<ItemAdapter.ViewHolder> {
                 notifyItemRemoved(position)
             }
         }.start()
+
     }
 
     public fun addItem(item: Item) {

@@ -14,7 +14,6 @@ class CategoryDialog : DialogFragment() {
 
     interface CategoryHandler{
         fun categoryCreated(category: Category)
-        fun categoryUpdated(category: Category)
     }
 
     lateinit var categoryHandler: CategoryHandler

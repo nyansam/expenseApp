@@ -55,19 +55,22 @@ class CategoryAdapter : RecyclerView.Adapter<CategoryAdapter.ViewHolder>,
         val currentItem = categoryItems[position]
 
         holder.tvCategory.text = currentItem.categoryName
-        holder.tvPrice.text = "Total price: " + currentItem.totalAmount.toString()
-        var numItems = 0
 
         Thread {
-            numItems = ItemDatabase.getInstance(context).itemDao().getAllInCategory(currentItem.categoryName).size
+            var allItems = ItemDatabase.getInstance(context).itemDao()
+                .getAllInCategory(currentItem.categoryName)
+            holder.tvNumItems.text = "Num items: " + allItems.size.toString()
+            var total = 0
+            for (item in allItems){
+                total += item.price.toInt()
+            }
+            holder.tvPrice.text = "Total price: " + total.toString()
         }.start()
-
-        holder.tvNumItems.text = "Num items: $numItems"
-
 
 
         holder.btnDelete.setOnClickListener {
             deleteCategory(holder.adapterPosition)
+            (context as ScrollingActivity).deleteCategoryItems(currentItem.categoryName)
         }
 
         holder.btnAdd.setOnClickListener {
@@ -112,7 +115,8 @@ class CategoryAdapter : RecyclerView.Adapter<CategoryAdapter.ViewHolder>,
         notifyItemInserted(categoryItems.lastIndex)
     }
 
-    public fun updateCategory() {
+    public fun updateCategory(categories: MutableList<Category>) {
+        categoryItems = categories
         notifyDataSetChanged()
     }
 

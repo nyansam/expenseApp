@@ -26,10 +26,10 @@ class DetailsActivity : AppCompatActivity() {
             runOnUiThread {
                 itemAdapter = ItemAdapter(this, categoryList)
                 recyclerItem.adapter = itemAdapter
-
             }
         }.start()
     }
+
 
     override fun onBackPressed() {
         finish()

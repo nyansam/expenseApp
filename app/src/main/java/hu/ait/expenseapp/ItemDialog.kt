@@ -72,6 +72,7 @@ class ItemDialog(category: String) : DialogFragment() {
 
         val positiveButton = (dialog as AlertDialog).getButton(Dialog.BUTTON_POSITIVE)
         positiveButton.setOnClickListener {
+            val arguments = this.arguments
             if (etItemName.text.isEmpty()) {
                 etItemName.error = getString(R.string.hint2)
             } else if (etItemPrice.text.isEmpty()) {
