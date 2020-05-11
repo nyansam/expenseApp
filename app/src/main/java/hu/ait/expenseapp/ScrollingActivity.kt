@@ -1,8 +1,8 @@
 package hu.ait.expenseapp
 
 
-//import com.google.android.material.snackbar.Snackbar
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.view.Menu
@@ -12,23 +12,30 @@ import android.view.animation.AnimationUtils
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.ItemTouchHelper
-import hu.ait.expenseapp.adapter.TodoAdapter
+import hu.ait.expenseapp.adapter.CategoryAdapter
+import hu.ait.expenseapp.adapter.ItemAdapter
 import hu.ait.expenseapp.data.AppDatabase
-import hu.ait.expenseapp.data.Todo
+import hu.ait.expenseapp.data.Category
+import hu.ait.expenseapp.data.Item
+import hu.ait.expenseapp.data.ItemDatabase
 import hu.ait.expenseapp.touch.TodoReyclerTouchCallback
+import kotlinx.android.synthetic.main.activity_details.*
 import kotlinx.android.synthetic.main.activity_scrolling.*
+import kotlinx.android.synthetic.main.activity_scrolling.app_bar
+import kotlinx.android.synthetic.main.activity_scrolling.toolbar
 import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt
 import java.util.*
 
 
-class ScrollingActivity : AppCompatActivity(), TodoDialog.TodoHandler {
+class ScrollingActivity : AppCompatActivity(), CategoryDialog.CategoryHandler, ItemDialog.ItemHandler {
 
-    lateinit var todoAdapter: TodoAdapter
+    lateinit var categoryAdapter: CategoryAdapter
+    lateinit var itemAdapter: ItemAdapter
 
     companion object {
-        const val KEY_EDIT = "KEY_EDIT"
 
-        const val PREF_NAME = "PREFTODO"
+        const val KEY_DATA = "KEY_DATA"
+        const val PREF_NAME = "PREF_NAME"
         const val KEY_STARTED = "KEY_STARTED"
         const val KEY_LAST_USED = "KEY_LAST_USED"
     }
@@ -36,9 +43,6 @@ class ScrollingActivity : AppCompatActivity(), TodoDialog.TodoHandler {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_scrolling)
-
-
-
 
         setSupportActionBar(toolbar)
         initRecyclerView()
@@ -64,60 +68,86 @@ class ScrollingActivity : AppCompatActivity(), TodoDialog.TodoHandler {
 
     private fun initRecyclerView() {
         Thread {
-            var todoList = AppDatabase.getInstance(this).todoDao().getAllTodos()
+            var categoryList = AppDatabase.getInstance(this).categoryDao().getAllCategories()
 
             runOnUiThread {
-                todoAdapter = TodoAdapter(this, todoList)
-                recyclerTodo.adapter = todoAdapter
+                categoryAdapter = CategoryAdapter(this, categoryList)
+                recyclerCategory.adapter = categoryAdapter
 
-                val touchCallbakList = TodoReyclerTouchCallback(todoAdapter)
+                val touchCallbakList = TodoReyclerTouchCallback(categoryAdapter)
                 val itemTouchHelper = ItemTouchHelper(touchCallbakList)
-                itemTouchHelper.attachToRecyclerView(recyclerTodo)
+                itemTouchHelper.attachToRecyclerView(recyclerCategory)
+            }
+        }.start()
+
+        Thread {
+            var itemList = ItemDatabase.getInstance(this).itemDao().getAllItems()
+
+            runOnUiThread {
+                itemAdapter = ItemAdapter(this, itemList)
+                //recyclerItem.adapter = itemAdapter
             }
         }.start()
     }
 
-    fun showAddTodoDialog() {
-        TodoDialog().show(supportFragmentManager, getString(R.string.dialog))
+    private fun showAddCategoryDialog() {
+        CategoryDialog().show(supportFragmentManager, getString(R.string.dialog))
+    }
+
+    fun showAddItemDialog(categoryName: String) {
+        ItemDialog(categoryName).show(supportFragmentManager, getString(R.string.dialog))
     }
 
     var editIndex: Int = -1
 
-    public fun showEditTodoDialog(todoToEdit: Todo, index: Int) {
-        editIndex = index
 
-        val editItemDialog = TodoDialog()
 
-        val bundle = Bundle()
-        bundle.putSerializable(KEY_EDIT, todoToEdit)
-        editItemDialog.arguments = bundle
-
-        editItemDialog.show(supportFragmentManager, getString(R.string.edit))
-
-    }
-
-    fun saveTodo(todo: Todo) {
+    fun saveCategory(category: Category) {
         Thread {
-            todo.todoId = AppDatabase.getInstance(this).todoDao().insertTodo(todo)
+            category.categoryId = AppDatabase.getInstance(this).categoryDao().insertCategory(category)
 
             runOnUiThread {
-                todoAdapter.addTodo(todo)
+                categoryAdapter.addCategory(category)
             }
         }.start()
     }
 
-    override fun todoCreated(todo: Todo) {
-        saveTodo(todo)
-    }
-
-    override fun todoUpdated(todo: Todo) {
+    fun saveItem(item: Item) {
         Thread {
-            AppDatabase.getInstance(this).todoDao().updateTodo(todo)
+            item.itemId = ItemDatabase.getInstance(this).itemDao().insertItem(item)
 
             runOnUiThread {
-                todoAdapter.updateTodo(todo, editIndex)
+                itemAdapter.addItem(item)
             }
         }.start()
+    }
+
+    override fun categoryCreated(category: Category) {
+        saveCategory(category)
+    }
+
+    override fun categoryUpdated(category: Category) {
+        Thread {
+            var categories = AppDatabase.getInstance(this).categoryDao().getAllCategories()
+
+            for (category in categories){
+                Thread {
+                    var allItems = ItemDatabase.getInstance(this).itemDao()
+                        .getAllInCategory(category.categoryName)
+                    category.numItems = allItems.size
+                    var total = 0
+                    for (item in allItems){
+                        total += item.price.toInt()
+                    }
+                }
+            }
+            categoryAdapter.updateCategory()
+        }.start()
+
+    }
+
+    override fun itemCreated(item: Item) {
+        saveItem(item)
     }
 
     //MENU
@@ -146,10 +176,7 @@ class ScrollingActivity : AppCompatActivity(), TodoDialog.TodoHandler {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
         if (item.itemId == R.id.action_item){
-
-            showAddTodoDialog()
-
-
+            showAddCategoryDialog()
         }
         else if (item.itemId == R.id.action_delete){
             var sendAnim = AnimationUtils.loadAnimation(this, R.anim.send_anim)
@@ -162,9 +189,9 @@ class ScrollingActivity : AppCompatActivity(), TodoDialog.TodoHandler {
                 }
                 override fun onAnimationStart(animation: Animation?) {
                     Thread {
-                        AppDatabase.getInstance(this@ScrollingActivity).todoDao().deleteAll()
+                        AppDatabase.getInstance(this@ScrollingActivity).categoryDao().deleteAll()
                         runOnUiThread {
-                            todoAdapter.deleteAll()
+                            categoryAdapter.deleteAll()
                         }
                     }.start()
                 }
@@ -187,5 +214,10 @@ class ScrollingActivity : AppCompatActivity(), TodoDialog.TodoHandler {
             Toast.LENGTH_LONG).show()
     }
 
+    fun showCategoryDetails(categoryName: String) {
+        val intentDetails = Intent(this, DetailsActivity::class.java)
+        intentDetails.putExtra(KEY_DATA, categoryName)
+        startActivity(intentDetails)
+    }
 
 }

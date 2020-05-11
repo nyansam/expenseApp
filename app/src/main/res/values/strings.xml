@@ -1,35 +1,36 @@
 <resources>
-    <string name="app_name">Final Project</string>
+    <string name="app_name">Expense Tracker</string>
     <string name="add_item">Add Item</string>
     <string name="delete_items">Delete All</string>
     <string name="DOLLAR">$</string>
     <string name="todo">todo.db</string>
-    <string name="welcome">Welcome to Shop Now!</string>
+    <string name="welcome">Welcome to Expense Tracker!</string>
     <string name="dialog">Dialog</string>
     <string name="edit">EDITDIALOG</string>
-    <string name="hint3">Click here to add new items to your Shop Now list!</string>
-    <string name="hint1">Add Item</string>
-    <string name="exception1">The Activity is not implementing the TodoHandler interface.</string>
-    <string name="new1">New Item</string>
-    <string name="edit_item">Edit Item</string>
+    <string name="hint3">Click here to add new categories to your expense tracker!</string>
+    <string name="hint1">Add Category</string>
+    <string name="exception1">The Activity is not implementing the ItemHandler interface.</string>
+    <string name="new1">New Category</string>
+    <string name="new2">New Item</string>
     <string name="ok">Ok</string>
     <string name="cancel">Cancel</string>
     <string name="hint2">This field can not be empty</string>
     <string name="item_name">Item Name:</string>
+    <string name="category_name">Category Name:</string>
     <string name="estimated_price">Estimated Price:</string>
     <string name="item_description">Item Description:</string>
     <string name="purchased">Purchased</string>
-    <string name="todo2">Todo</string>
+    <string name="cate">Category</string>
     <string name="price">price</string>
     <string name="desc">desc</string>
     <string name="todo3">todo</string>
-    <string name="delete">Delete</string>
-    <string name="view_item_details">View Item Details</string>
+    <string name="item">item</string>
+    <string name="delete">Delete Category</string>
+    <string name="view_item_details">View Category Details</string>
 
     <string-array name="categories">
-        <item>Food/Drinks</item>
-        <item>Clothing</item>
-        <item>Beauty/Personal</item>
+        <item>Expense</item>
+        <item>Income</item>
     </string-array>
 </resources>
 

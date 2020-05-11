@@ -6,10 +6,10 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import hu.ait.expenseapp.R
 
-@Database(entities = arrayOf(Todo::class), version = 3)
+@Database(entities = arrayOf(Category::class), version = 2)
 abstract class AppDatabase : RoomDatabase() {
 
-    abstract fun todoDao(): TodoDAO
+    abstract fun categoryDao(): CategoryDAO
 
     companion object {
         private var INSTANCE: AppDatabase? = null
@@ -28,4 +28,5 @@ abstract class AppDatabase : RoomDatabase() {
             INSTANCE = null
         }
     }
+
 }

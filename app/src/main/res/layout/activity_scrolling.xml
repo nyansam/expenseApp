@@ -42,7 +42,7 @@
 
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerTodo"
+        android:id="@+id/recyclerCategory"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="20dp"
@@ -50,6 +50,7 @@
         android:scrollbars="vertical"
 
         app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+
 
 
 
