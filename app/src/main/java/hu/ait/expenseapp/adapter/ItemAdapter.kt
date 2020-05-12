@@ -82,6 +82,17 @@ class ItemAdapter : RecyclerView.Adapter<ItemAdapter.ViewHolder> {
         notifyDataSetChanged()
     }
 
+    public fun deleteItemsInCategory(categoryName: String){
+        var newList = groceryItems.toMutableList()
+        for (item in groceryItems){
+            if (item.category != categoryName){
+                newList.add(item)
+            }
+        }
+        groceryItems = newList
+        notifyDataSetChanged()
+    }
+
 
     fun onDismissed(position: Int) {
         deleteItem(position)

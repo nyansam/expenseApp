@@ -19,6 +19,7 @@ import hu.ait.expenseapp.data.Category
 import hu.ait.expenseapp.data.Item
 import hu.ait.expenseapp.data.ItemDatabase
 import hu.ait.expenseapp.touch.TodoReyclerTouchCallback
+import kotlinx.android.synthetic.main.activity_details.*
 import kotlinx.android.synthetic.main.activity_scrolling.*
 import kotlinx.android.synthetic.main.activity_scrolling.app_bar
 import kotlinx.android.synthetic.main.activity_scrolling.toolbar
@@ -87,6 +88,7 @@ class ScrollingActivity : AppCompatActivity(), CategoryDialog.CategoryHandler, I
                 //recyclerItem.adapter = itemAdapter
             }
         }.start()
+
     }
 
     private fun showAddCategoryDialog() {
@@ -95,6 +97,7 @@ class ScrollingActivity : AppCompatActivity(), CategoryDialog.CategoryHandler, I
 
     fun showAddItemDialog(categoryName: String) {
         ItemDialog(categoryName).show(supportFragmentManager, getString(R.string.dialog))
+        //updateCategories()
     }
 
     var editIndex: Int = -1
@@ -125,6 +128,9 @@ class ScrollingActivity : AppCompatActivity(), CategoryDialog.CategoryHandler, I
     public fun deleteCategoryItems(categoryName: String){
         Thread {
             ItemDatabase.getInstance(this).itemDao().deleteAllInCategory(categoryName)
+        }.start()
+        runOnUiThread{
+            itemAdapter.deleteItemsInCategory(categoryName)
         }
     }
 
@@ -132,10 +138,10 @@ class ScrollingActivity : AppCompatActivity(), CategoryDialog.CategoryHandler, I
         saveCategory(category)
     }
 
-    public fun updateCategories() {
+    private fun updateCategories() {
         Thread {
             var categories = AppDatabase.getInstance(this).categoryDao().getAllCategories()
-
+            categoryAdapter = CategoryAdapter(this, categories)
             for (category in categories){
                 Thread {
                     var allItems = ItemDatabase.getInstance(this).itemDao()
@@ -149,7 +155,8 @@ class ScrollingActivity : AppCompatActivity(), CategoryDialog.CategoryHandler, I
                 }.start()
             }
             runOnUiThread {
-                categoryAdapter.updateCategory(categories)
+                categoryAdapter = CategoryAdapter(this, categories)
+                recyclerCategory.adapter = categoryAdapter
             }
         }.start()
 
@@ -197,6 +204,7 @@ class ScrollingActivity : AppCompatActivity(), CategoryDialog.CategoryHandler, I
 
                 }
                 override fun onAnimationStart(animation: Animation?) {
+
                     Thread {
                         AppDatabase.getInstance(this@ScrollingActivity).categoryDao().deleteAll()
                         runOnUiThread {
@@ -215,9 +223,6 @@ class ScrollingActivity : AppCompatActivity(), CategoryDialog.CategoryHandler, I
 
             app_bar.startAnimation(sendAnim)
 
-
-
-
         }
 
         return super.onOptionsItemSelected(item)
@@ -233,6 +238,11 @@ class ScrollingActivity : AppCompatActivity(), CategoryDialog.CategoryHandler, I
         val intentDetails = Intent(this, DetailsActivity::class.java)
         intentDetails.putExtra(KEY_DATA, categoryName)
         startActivity(intentDetails)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        updateCategories()
     }
 
 }

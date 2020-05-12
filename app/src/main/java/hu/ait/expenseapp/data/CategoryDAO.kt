@@ -7,7 +7,6 @@ interface CategoryDAO {
     @Query("SELECT * FROM category")
     fun getAllCategories(): MutableList<Category>
 
-
     @Insert
     fun insertCategory(category: Category) : Long
 

@@ -56,16 +56,11 @@ class CategoryAdapter : RecyclerView.Adapter<CategoryAdapter.ViewHolder>,
 
         holder.tvCategory.text = currentItem.categoryName
 
-        Thread {
-            var allItems = ItemDatabase.getInstance(context).itemDao()
-                .getAllInCategory(currentItem.categoryName)
-            holder.tvNumItems.text = "Num items: " + allItems.size.toString()
-            var total = 0
-            for (item in allItems){
-                total += item.price.toInt()
-            }
-            holder.tvPrice.text = "Total price: " + total.toString()
-        }.start()
+
+        holder.tvNumItems.text = "Num items: " + currentItem.numItems.toString()
+
+        holder.tvPrice.text = "Total price: " + currentItem.totalAmount.toString()
+
 
 
         holder.btnDelete.setOnClickListener {
@@ -94,6 +89,7 @@ class CategoryAdapter : RecyclerView.Adapter<CategoryAdapter.ViewHolder>,
     fun deleteAll() {
         categoryItems.clear()
         notifyDataSetChanged()
+
     }
 
     private fun deleteCategory(position: Int) {
@@ -105,19 +101,27 @@ class CategoryAdapter : RecyclerView.Adapter<CategoryAdapter.ViewHolder>,
                 categoryItems.removeAt(position)
                 notifyItemRemoved(position)
             }
+            context.deleteCategoryItems(categoryItems.get(position).categoryName)
         }.start()
     }
 
 
     public fun addCategory(category: Category) {
         categoryItems.add(category)
-
         notifyItemInserted(categoryItems.lastIndex)
+
     }
 
     public fun updateCategory(categories: MutableList<Category>) {
-        categoryItems = categories
-        notifyDataSetChanged()
+        Thread {
+            for (category in categories){
+                AppDatabase.getInstance(context).categoryDao().updateCategory(category)
+            }
+            (context as ScrollingActivity).runOnUiThread {
+                categoryItems = categories
+                notifyDataSetChanged()
+            }
+        }.start()
     }
 
     override fun onDismissed(position: Int) {

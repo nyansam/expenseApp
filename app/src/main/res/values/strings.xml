@@ -26,6 +26,7 @@
     <string name="todo3">todo</string>
     <string name="item">item</string>
     <string name="delete">Delete Category</string>
+    <string name="deleteItem">Delete Item</string>
     <string name="view_item_details">View Category Details</string>
 
     <string-array name="categories">
