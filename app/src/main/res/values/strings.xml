@@ -28,6 +28,8 @@
     <string name="delete">Delete Category</string>
     <string name="deleteItem">Delete Item</string>
     <string name="view_item_details">View Category Details</string>
+    <string name="enter_base_country">Enter base country</string>
+    <string name="update_base_country">Update</string>
 
     <string-array name="categories">
         <item>Expense</item>

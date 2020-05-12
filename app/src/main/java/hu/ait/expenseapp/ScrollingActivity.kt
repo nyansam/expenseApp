@@ -1,6 +1,7 @@
 package hu.ait.expenseapp
 
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -31,6 +32,7 @@ class ScrollingActivity : AppCompatActivity(), CategoryDialog.CategoryHandler, I
 
     lateinit var categoryAdapter: CategoryAdapter
     lateinit var itemAdapter: ItemAdapter
+    var baseCountry = "United States"
 
     companion object {
 
@@ -46,6 +48,13 @@ class ScrollingActivity : AppCompatActivity(), CategoryDialog.CategoryHandler, I
 
         setSupportActionBar(toolbar)
         initRecyclerView()
+
+        btnEditCountry.setOnClickListener {
+            baseCountry = etBaseCountry.text.toString()
+            tvBaseCountry.text = "Base country: $baseCountry"
+        }
+
+        tvBaseCountry.text = "Base country: $baseCountry"
 
     }
 
